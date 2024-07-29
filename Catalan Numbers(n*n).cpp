@@ -6,3 +6,4 @@ ll cat[1001];
             res += cat[j] * cat[i - j - 1],
             res %= Mod;
     }
+// cat(n) = nCr(2n, n) / (n + 1)
