@@ -1,8 +1,8 @@
-vector<int> parent, rank;
+vector<int> parent, rating;
 
 void make_set(int v) {
     parent[v] = v;
-    rank[v] = 0;
+    rating[v] = 0;
 }
 
 int find_set(int v) {
@@ -15,11 +15,11 @@ void union_sets(int a, int b) {
     a = find_set(a);
     b = find_set(b);
     if (a != b) {
-        if (rank[a] < rank[b])
+        if (rating[a] < rating[b])
             swap(a, b);
         parent[b] = a;
-        if (rank[a] == rank[b])
-            rank[a]++;
+        if (rating[a] == rating[b])
+            rating[a]++;
     }
 }
 
@@ -35,9 +35,9 @@ vector<Edge> edges;
 
 int cost = 0;
 vector<Edge> result;
-parent.resize(n);
-rank.resize(n);
-for (int i = 0; i < n; i++)
+parent.resize(n+1);
+rating.resize(n+1);
+for (int i = 0; i <= n; i++)
     make_set(i);
 
 sort(edges.begin(), edges.end());
