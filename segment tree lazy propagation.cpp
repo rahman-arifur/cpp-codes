@@ -20,7 +20,7 @@ struct ST {
 		return a + b;
 	}
 	inline void pull(int n) {
-		t[n] = t[lc] + t[rc];
+		t[n] = combine(t[lc], t[rc]);
 	}
 	void build(int n, int b, int e) {
 		lazy[n] = 0;
