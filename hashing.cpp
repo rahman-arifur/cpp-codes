@@ -9,8 +9,8 @@ struct Hash {
         hashes.assign(n+1, {0,0});
         expo.assign(n+1, {1,1});
         for(int i=0;i<n;i++) {
-            hashes[i+1] = { ((1LL * hashes[i].first * B1 % M1) + (s[i]-'a'+1)) % M1 ,
-                            ((1LL * hashes[i].second * B2 % M2) + (s[i]-'a'+1)) % M2 };
+            hashes[i+1] = { ((1LL * hashes[i].first * B1 % M1) + s[i]) % M1 ,
+                            ((1LL * hashes[i].second * B2 % M2) + s[i]) % M2 };
             expo[i+1] = { 1LL * expo[i].first * B1 % M1 ,
                             1LL * expo[i].second * B2 % M2 };
         }
