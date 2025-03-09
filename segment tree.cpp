@@ -1,66 +1,59 @@
-#include "bits/stdc++.h"
-using namespace std;
-using ll=long long; 
-vector<int> a;
-vector<ll> tree;
 
-int N,q;
-void build(int i = 0) {
-    for(;i < N; i++)
-        tree[i + N] = a[i];
-    for(i = N - 1; i; i--) 
-        tree[i] = tree[i << 1] + tree[(i << 1) + 1];
-}
+template <typename T>
+class SegmentTree {
+private:
+	vector<T> tree, arr;
+	int n;
+    T E; // when out of range what value to return
+    // ex: if out of range for range minimum E=+inf
+    // if xor E=0;
+    #define left(x) ((x << 1) | 1)
+    #define right(x) ((x << 1) + 2)
+	int mid(int l, int r) { return r + l >> 1; }
+	T func(T a, T b) { 
+		return a & b; // make it add, min, max, xor
+	}
+	void build(int nd, int st, int ed) {
+		if (st == ed) return void(tree[nd] = arr[st]);
+		int m = mid(st, ed);
+		build(left(nd), st, m);
+		build(right(nd), m + 1, ed);
+		tree[nd] = func(tree[left(nd)], tree[right(nd)]);
+	}
 
-ll query(int node, int left, int right, const int& queryL, const int& queryR) {
-    if(left > queryR or right < queryL) return 0;
-    if(queryL <= left and right <= queryR) return tree[node];
-    int mid = (left + right) >> 1;
-    return query(2 * node, left, mid, queryL, queryR) +
-            query(2 * node + 1, mid + 1, right, queryL, queryR);
-}
+	void update(int nd, int st, int ed, int idx, T val) {
+		if (st == ed) {
+			arr[idx] = val;
+			tree[nd] = val;
+			return;
+		}
+		int m = mid(st, ed);
+		if (idx <= m)
+			update(left(nd), st, m, idx, val);
+		else
+			update(right(nd), m + 1, ed, idx, val);
+		tree[nd] = func(tree[left(nd)], tree[right(nd)]);
+	}
 
-ll queryIterative(int L, int R) {
-    ll sum = 0;
-    for(L += N, R += N; L <= R; L >>= 1, R >>= 1) {
-            if(L & 1) sum += tree[L++];
-            if((R & 1) == 0) sum += tree[R--];
-    }
-    return sum;
-}
+	T query(int nd, int st, int ed, int l, int r) {
+		if (r < st || ed < l) return E;
+		if (l <= st && ed <= r) return tree[nd];
+		int m = mid(st, ed);
+		T L = query(left(nd), st, m, l, r);
+		T R = query(right(nd), m + 1, ed, l, r);
+		return func(L, R);
+	}
 
-void update(int pos, int val) {
-    int i = N + pos;
-    tree[i] = a[i - N] = val;
-    for(i >>= 1; i; i >>= 1) 
-        tree[i] = tree[i << 1] + tree[(i << 1) + 1];
-}
-signed main() 
-{
-    cin.tie(nullptr) -> sync_with_stdio(false);
-    /*   tophhh   */
-    cin >> N >> q;
-    for(int i = 0, x; i < N; i++) {
-        cin >> x;
-        a.push_back(x);
-    }
-
-    while(__builtin_popcount(N) != 1) {
-        ++N;
-        a.push_back(0);
-    }
-
-    tree.resize(N << 1);
-    build();
-
-    int  L, R;
-    while(q--) { 
-        cin >> L >> R;
-        --L, --R; 
-        cout << 
-        // query(1, 0, N - 1, L, R)
-        queryIterative(L, R)
-         << "\n"; 
-    }
-return 0;
-}
+public:
+	SegmentTree(const vector<T>& a, T E)
+		: arr(a), E(E), n(a.size()) {
+		tree.resize(4 * n, E);
+		build(0, 0, n - 1);
+	}
+	void update(int idx, T val) {
+		update(0, 0, n - 1, idx, val);
+	}
+    T query(int l, int r) {
+		return query(0, 0, n - 1, l, r);
+	}
+};
