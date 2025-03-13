@@ -9,6 +9,7 @@ void pre() {
             for(j=i*i;j<mxn;j+=(i<<1)) ok[j]=1;
         }
 }
+
 vector<int> primeFactors(int n) {
     vector<int> pp;
     for (auto& p:primes) {
@@ -42,4 +43,28 @@ int countCoprime(int x, int n) {
         else nonCoprime -= count;
     }
     return x - nonCoprime;
+}
+
+void phi_1_to_n(int n) {
+    vector<int> phi(n + 1);
+    phi[0] = 0;
+    phi[1] = 1;
+    for (int i = 2; i <= n; i++)
+        phi[i] = i - 1;
+
+    for (int i = 2; i <= n; i++)
+        for (int j = 2 * i; j <= n; j += i)
+              phi[j] -= phi[i];
+}
+int phi(ll n) {
+    int ret=n;
+    for (auto& p:primes) {
+        if (n%p==0) {
+            ret -= ret/p;
+            while (n%p==0)n/=p;
+        }
+        else if(p*p>n)break;
+    }
+    if(n>1) ret-=ret/n;
+    return ret;
 }
