@@ -1,24 +1,22 @@
 struct DSU{
-    vector<int> parent, sizes;
-    int n;
-    DSU(int c) : n(c) {
-        parent.resize(n + 1);
-        iota(begin(parent), end(parent), 0);
-        sizes = vector<int> (n + 1, 1);
+private:
+    vector<int> par, sz;
+    int n, compo;
+public:
+    DSU(int c) : n(c), compo(c) {
+        par.resize(n + 1);
+        iota(par.begin(), par.end(), 0);
+        sz = vector<int> (n + 1, 1);
     }
-    int find(int v) {
-        while(v != parent[v])
-            v = parent[v] = parent[parent[v]];
-        return v;
-    }
-    bool same(int u, int v) {
-        return find(u) == find(v);
-    }
-    void unite(int u, int v) {
+    int getCompo() { return compo; }
+    int getSize(int v) { return sz[find(v)]; }
+    int find(int v) {  while(v!=par[v])v=par[v]=par[par[v]]; return v;  }
+    bool same(int u, int v) {  return find(u) == find(v);  } 
+    bool unite(int u, int v) {
         u = find(u), v = find(v);
-        if(u == v) return;
-        if(sizes[u] > sizes[v]) swap(u, v);
-        parent[u] = v;
-        sizes[v] += sizes[u];
+        if(u==v) return false; compo--;
+        if(sz[u] > sz[v]) swap(u, v);
+        par[u] = v;
+        return sz[v] += sz[u];
     }
 };
