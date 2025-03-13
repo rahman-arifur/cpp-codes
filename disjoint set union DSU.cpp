@@ -4,7 +4,7 @@ struct DSU{
     DSU(int c) : n(c) {
         parent.resize(n + 1);
         iota(begin(parent), end(parent), 0);
-        sizes = vector<int> (n + 1, 0);
+        sizes = vector<int> (n + 1, 1);
     }
     int find(int v) {
         while(v != parent[v])
