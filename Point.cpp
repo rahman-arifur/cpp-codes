@@ -34,3 +34,12 @@ struct Point {
     return in>>p.x>>p.y;
   }
 };
+ld pt_to_seg_mindis(Point<ll>& pt, Point<ll>& a, Point<ll>& b) {
+    Point ab = b - a;
+    Point ap = pt - a;
+    auto bp = pt - b;
+    auto ba = a- b;
+    if(ab.dot(ap) < 0) return ap.dist();
+    else if(ba.dot(bp)<0) return bp.dist();
+    else return fabsl(ap.cross(ab))/ab.dist();
+}
