@@ -6,9 +6,9 @@ const ld PI = acosl(-1);
 short sign(ll x) { return (x > 0) - (x < 0); }
 struct Point {
   typedef Point P;
-  using T = long long;
+  typedef long long T;
   T x, y;
-  explicit Point(T x=0, T y=0) : x(x), y(y) {}
+  Point(T x=0, T y=0) : x(x), y(y) {}
   bool operator<(P& p) const { return tie(x,y) < tie(p.x,p.y); }
   bool operator==(P& p) const { return tie(x,y)==tie(p.x,p.y); }
   P operator+(P& p) const { return P(x+p.x, y+p.y); }
@@ -26,17 +26,12 @@ struct Point {
   P perp() const { return P(-y, x); } // rotates +90 degrees
   P normal() const { return perp().unit(); }
   // returns point rotated 'a' radians ccw around the origin
-  P rotate(long double a) const {
-    return P(x*cosl(a)-y*sinl(a),x*sinl(a)+y*cosl(a)); }
-  friend ostream& operator<<(ostream& os, P p) {
-    return os << p.x << ' ' << p.y << '\n'; }
-  friend istream& operator>>(istream&in,P&p) {
-    return in>>p.x>>p.y;
-  }
+  P rotate(long double a) const {return P(x*cosl(a)-y*sinl(a),x*sinl(a)+y*cosl(a)); }
+  friend ostream& operator<<(ostream& os, P p) {return os << p.x << ' ' << p.y << '\n';}
+  friend istream& operator>>(istream&in,P&p) {return in>>p.x>>p.y;}
 };
-int orientation(PT& a, PT& b, PT& c) { return sign((b-a).cross(c-a)); }
-
-ld pt_to_seg_mindis(Point<ll>& pt, Point<ll>& a, Point<ll>& b) {
+int orientation(Point& a, Point& b, Point& c) { return sign((b-a).cross(c-a)); }
+ld pt_to_seg_mindis(Point& pt, Point& a, Point& b) {
     Point ab = b - a;
     Point ap = pt - a;
     auto bp = pt - b;
