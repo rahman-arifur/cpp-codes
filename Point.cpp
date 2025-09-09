@@ -3,10 +3,10 @@ using namespace std;
 using ll = long long;
 using ld = long double;
 const ld PI = acosl(-1);
-template <class T=ll> int sign(T x) { return (x > 0) - (x < 0); }
-template<class T=ll>
+short sign(ll x) { return (x > 0) - (x < 0); }
 struct Point {
   typedef Point P;
+  using T = long long;
   T x, y;
   explicit Point(T x=0, T y=0) : x(x), y(y) {}
   bool operator<(P& p) const { return tie(x,y) < tie(p.x,p.y); }
@@ -15,9 +15,9 @@ struct Point {
   P operator-(P& p) const { return P(x-p.x, y-p.y); }
   P operator*(T d) const { return P(x*d, y*d); }
   P operator/(T d) const { return P(x/d, y/d); }
-  T dot(P& p) const { return x*p.x + y*p.y; }
-  T cross(P& p) const { return x*p.y - y*p.x; }
-  T cross(P& a, P& b) const { return (a-*this).cross(b-*this); }
+  T dot(P p) const { return x*p.x + y*p.y; }
+  T cross(P p) const { return x*p.y - y*p.x; }
+  T cross(P a, P b) const { return (a-*this).cross(b-*this); }
   T dist2() const { return x*x + y*y; }
   ld dist() const { return sqrtl(dist2()); }
   // angle to x-axis in interval [-pi, pi]
@@ -29,11 +29,13 @@ struct Point {
   P rotate(long double a) const {
     return P(x*cosl(a)-y*sinl(a),x*sinl(a)+y*cosl(a)); }
   friend ostream& operator<<(ostream& os, P p) {
-    return os << "(" << p.x << "," << p.y << ")"; }
+    return os << p.x << ' ' << p.y << '\n'; }
   friend istream& operator>>(istream&in,P&p) {
     return in>>p.x>>p.y;
   }
 };
+int orientation(PT& a, PT& b, PT& c) { return sign((b-a).cross(c-a)); }
+
 ld pt_to_seg_mindis(Point<ll>& pt, Point<ll>& a, Point<ll>& b) {
     Point ab = b - a;
     Point ap = pt - a;
