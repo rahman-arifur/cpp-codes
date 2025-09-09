@@ -1,30 +1,49 @@
-#include <bits/stdc++.h>
-
+#include "bits/stdc++.h"
 using namespace std;
-
-// Convex hull construction in O(n*log(n)): https://cp-algorithms.com/geometry/grahams-scan-convex-hull.html
-
-struct point {
-    int x, y;
+struct Point {
+  typedef Point P;
+  typedef long long T;
+  T x, y;
+  Point(T x=0, T y=0) : x(x), y(y) {}
+  bool operator<(P& a)const{ return x==a.x?y<a.y:x<a.x; }
+  bool operator==(P& a)const{ return x==a.x and y==a.y; }
+  P operator-(P p) const { return P(x-p.x, y-p.y); }
+  T dot(P p) const { return x*p.x + y*p.y; }
+  T cross(P p) const { return x*p.y - y*p.x; }
+  friend istream& operator>>(istream&in,P&p) {
+    return in>>p.x>>p.y;
+  }
 };
-
-bool isNotRightTurn(const point &a, const point &b, const point &c) {
-    long long cross = (long long)(a.x - b.x) * (c.y - b.y) - (long long)(a.y - b.y) * (c.x - b.x);
-    long long dot = (long long)(a.x - b.x) * (c.x - b.x) + (long long)(a.y - b.y) * (c.y - b.y);
-    return cross < 0 || (cross == 0 && dot <= 0);
-}
-
-vector<point> convex_hull(vector<point> points) {
-    sort(points.begin(), points.end(), [](auto& a, auto& b) { return a.x < b.x || (a.x == b.x && a.y < b.y); });
+vector<Point> convex_hull(vector<Point> points) {
+    sort(points.begin(), points.end());
+    points.erase(unique(points.begin(), points.end()), points.end());
     int n = points.size();
-    vector<point> hull;
-    for (int i = 0; i < 2 * n - 1; i++) {
-        int j = i < n ? i : 2 * n - 2 - i;
-        while (hull.size() >= 2 && isNotRightTurn(hull.end()[-2], hull.end()[-1], points[j]))
+    if (n < 3) return points;
+    vector<Point> hull;
+    for (int i = 0; i < n; i++) {
+        while (hull.size() >= 2 && (hull.back()-hull[hull.size()-2]).cross(points[i]-hull[hull.size()-2]) <= 0) 
             hull.pop_back();
-        hull.push_back(points[j]);
+        hull.push_back(points[i]);
+    }
+    int lower_size = hull.size();
+    for (int i = n - 2; i >= 0; i--) {
+        while (hull.size() > lower_size && (hull.back()-hull[hull.size()-2]).cross(points[i]-hull[hull.size()-2]) <= 0) 
+            hull.pop_back();
+        hull.push_back(points[i]);
     }
     hull.pop_back();
     return hull;
 }
-// returns the points
+signed main() {
+    cin.tie(0)->sync_with_stdio(0);
+    int n;
+    for(cin>>n;n;cin>>n) {
+        vector<Point> v(n);
+        for(int i=0;i<n;i++)cin>>v[i];
+        v = convex_hull(v);
+        n = v.size();
+        cout<<n<<'\n';
+        // https://open.kattis.com/problems/convexhull
+        for(int i=0;i<n;i++)cout<<v[i].x<<' '<<v[i].y<<'\n';
+    }
+}
