@@ -1,6 +1,7 @@
 #include "bits/stdc++.h"
 using namespace std;
 using ll = long long;
+// https://robert1003.github.io/2020/01/31/cdq-divide-and-conquer.html
 // https://www.spoj.com/problems/LIS2/
 #define all(x) x.begin(), x.end()
 struct point{
