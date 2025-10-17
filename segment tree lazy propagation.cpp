@@ -1,56 +1,60 @@
-int a[202020];
-const int N=202020;
-struct ST {
-    #define lc (n << 1)
-    #define rc ((n << 1) | 1)
-	ll t[4 * N]{}, lazy[4 * N]{};
-	void setup(int _n) {
-        for(int i=0;i<4*_n;i++)t[i]=lazy[i]=0;
+template <class T>
+class segtree {// 0 based
+private:
+	int n;
+	vector<T> tree, lazy;
+	// change combine and push function
+	T combine(T x, T y) {
+		return min(x, y);
+	}
+	void push(int at, int l, int r) {
+		if (lazy[at] == 0) return;
+		tree[at] += lazy[at];
+		if (l != r) {
+      lazy[at << 1] += lazy[at];
+      lazy[at << 1 | 1] += lazy[at];
     }
-	inline void push(int n, int b, int e) {
-		if (lazy[n] == 0) return;
-		t[n] = t[n] + lazy[n] * (e - b + 1);
-		if (b != e) {
-			lazy[lc] = lazy[lc] + lazy[n];
-			lazy[rc] = lazy[rc] + lazy[n];
-		}
-		lazy[n] = 0;
+		lazy[at] = 0;
 	}
-	inline ll combine(ll a,ll b) {
-		return a + b;
-	}
-	inline void pull(int n) {
-		t[n] = combine(t[lc], t[rc]);
-	}
-	void build(int n, int b, int e) {
-		lazy[n] = 0;
-		if (b == e) {
-			t[n] = a[b];
+	void build(vector<T> &arr, int at, int l, int r) {
+    if (l == r) {
+			tree[at] = arr[l];
 			return;
 		}
-		int mid = (b + e) >> 1;
-		build(lc, b, mid);
-		build(rc, mid + 1, e);
-		pull(n);
+		int m = (l + r) >> 1;
+		build(arr, at << 1, l, m);
+		build(arr, at << 1 | 1, m + 1, r);
+		tree[at] = combine(tree[at << 1], tree[at << 1 | 1]);
 	}
-	void upd(int n, int b, int e, int i, int j, ll v) {
-		push(n, b, e);
-		if (j < b || e < i) return;
-		if (i <= b && e <= j) {
-			lazy[n] = v;  // set lazy
-			push(n, b, e);
+	void update(int at, int l, int r, int L, int R, T val) {
+    push(at, l, r);
+		if (r < L || R < l) return;
+		if (L <= l && r <= R) {
+      lazy[at] += val;
+			push(at, l, r);
 			return;
 		}
-		int mid = (b + e) >> 1;
-		upd(lc, b, mid, i, j, v);
-		upd(rc, mid + 1, e, i, j, v);
-		pull(n);
+		int m = (l + r) >> 1;
+		update(at << 1, l, m, L, R, val);
+		update(at << 1 | 1, m + 1, r, L, R, val);
+		tree[at] = combine(tree[at << 1], tree[at << 1 | 1]);
 	}
-	ll query(int n, int b, int e, int i, int j) {
-		push(n, b, e);
-		if(i>e || b>j) return 0;  // return null
-		if (i<=b && e<=j) return t[n];
-		int mid = (b + e) >> 1;
-		return combine(query(lc, b, mid, i, j), query(rc, mid + 1, e, i, j));
+  
+	T query(int at, int l, int r, int L, int R) {
+    push(at, l, r);
+		if (L <= l && r <= R) return tree[at];
+		int m = (l + r) >> 1;
+		if (R <= m) return query(at << 1, l, m, L, R);
+		if (m < L) return query(at << 1 | 1, m + 1, r, L, R);
+		return combine(query(at << 1, l, m, L, R), query(at << 1 | 1, m + 1, r, L, R));
 	}
-} segt;
+public:
+  T query(int l, int r) { return query(1, 0, n - 1, l, r); }	// Use this
+  void update(int l, int r, T val) { update(1, 0, n - 1, l, r, val); }  // Use this
+  segtree(int _n) {
+    tree.resize(4 * _n, 2e9);
+    lazy.resize(4 * _n, 0);
+    n = _n;
+  }
+  void build(vector<T> &arr) { build(arr, 1, 0, n - 1); }	 // Use this
+};
