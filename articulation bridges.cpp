@@ -1,15 +1,10 @@
-vector<vector<int>> adj; // adjacency list of graph
-
-vector<bool> vis;
-vector<int> tin, low;
-int timer;
-
+vector<int> adj[N];
+int timer, tin[N], low[N];
 void dfs(int v, int p = -1) {
-    vis[v] = true;
-    tin[v] = low[v] = timer++;
+    tin[v] = low[v] = ++timer;
     for (int to : adj[v]) {
         if (to == p) continue;
-        if (vis[to]) 
+        if (tin[to]) 
             low[v] = min(low[v], tin[to]);
         else {
             dfs(to, v);
