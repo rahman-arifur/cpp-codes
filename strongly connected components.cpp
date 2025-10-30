@@ -1,6 +1,6 @@
 const int mxn = 100003;
 vector<int> adj[mxn], stak;
-int tin[mxn], low[mxn], n, color[mxn]// component no 1 based;
+int tin[mxn], low[mxn], n, color[mxn];// component no 1 based;
 bool onstack[mxn];
 int timer = 0, sccCount = 0;
 void dfs(int at) {
