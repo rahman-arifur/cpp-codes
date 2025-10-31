@@ -1,8 +1,4 @@
-#include "bits/stdc++.h"
-using namespace std;
-#define all(x) x.begin(), x.end()
 typedef long long ll;
-
 namespace rho {
 	ll mul(ll a, ll b, ll mod) {
 		ll ret = a * b - mod * (ll)(1.L / mod * a * b);

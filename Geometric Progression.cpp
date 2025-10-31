@@ -1,6 +1,3 @@
-#include<bits/stdc++.h>
-using namespace std;
-using ll = long long;
 // https://atcoder.jp/contests/abc293/tasks/abc293_e
 // find sum of pow(A, i) for all 0 <= i < X modulo M
 // a^0 + a^1 + ... + a^x (under Mod m)
@@ -31,12 +28,4 @@ int sum(ll x, int a) {
     return (cur + 1LL * powMod(a, p + 1) * cur % Mod) % Mod;
   }
   return (sum(x - 1, a) + powMod(a, x)) % Mod;
-}
-int32_t main() {
-  ios_base::sync_with_stdio(0);
-  cin.tie(0);
-  int a; ll x; 
-  cin >> a >> x >> Mod;
-  cout << sum(x - 1, a) << '\n';
-  return 0;
 }
