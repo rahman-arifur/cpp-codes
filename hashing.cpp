@@ -1,5 +1,6 @@
 class RollingHash {
 public:
+// base, mod = (1949313259LL, 2091573227LL), (1997293877, 2117566807)
 	int n;
 	static const ll MOD1 = 1e9 + 7, MOD2 = 1e9 + 9, base = 43;
 	vector<int> fwd1, fwd2, rev1, rev2, pow1, pow2;
