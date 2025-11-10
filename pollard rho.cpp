@@ -1,7 +1,7 @@
 typedef long long ll;
 namespace rho {
 	ll mul(ll a, ll b, ll mod) {
-		ll ret = a * b - mod * (ll)(1.L / mod * a * b);
+		ll ret = __int128(a) * b - mod * (ll)(1.L / mod * a * b);
 		return ret + mod * (ret < 0) - mod * (ret >= (ll)mod);
 	}
 
