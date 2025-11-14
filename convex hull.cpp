@@ -4,11 +4,11 @@ using ll = long long;
 using ld = long double;
 const ld PI = acosl(-1);
 short sign(ll x) { return (x > 0) - (x < 0); }
-struct Point {
-  typedef Point P;
+struct PT {
+  typedef PT P;
   typedef long double T;
   T x, y;
-  Point(T x=0, T y=0) : x(x), y(y) {}
+  PT(T x=0, T y=0) : x(x), y(y) {}
   bool operator<(P& p) const { return tie(x,y) < tie(p.x,p.y); }
   bool operator==(P& p) const { return tie(x,y)==tie(p.x,p.y); }
   P operator+(P& p) const { return P(x+p.x, y+p.y); }
@@ -30,12 +30,12 @@ struct Point {
   friend ostream& operator<<(ostream& os, P p) {return os << p.x << ' ' << p.y << '\n';}
   friend istream& operator>>(istream&in,P&p) {return in>>p.x>>p.y;}
 };
-vector<Point> convex_hull(vector<Point> points) {
+vector<PT> convex_hull(vector<PT> points) {
     sort(points.begin(), points.end());
     points.erase(unique(points.begin(), points.end()), points.end());
     int n = points.size();
     if (n < 3) return points;
-    vector<Point> hull;
+    vector<PT> hull;
     for (int i = 0; i < n; i++) {
         while (hull.size() >= 2 && (hull.back()-hull[hull.size()-2]).cross(points[i]-hull[hull.size()-2]) <= 0) 
             hull.pop_back();
@@ -50,7 +50,7 @@ vector<Point> convex_hull(vector<Point> points) {
     hull.pop_back();
     return hull;
 }
-ld diameter(vector<Point>& v) {
+ld diameter(vector<PT>& v) {
     int n = v.size();
     if(n==1)return 0;
     if(n==2)return (v[0]-v[1]).dist();
@@ -70,7 +70,7 @@ signed main()
 {
     cin.tie(0)->sync_with_stdio(0);
     int n;cin>>n;
-    vector<Point> v(n);
+    vector<PT> v(n);
     for(auto& u:v)cin>>u;
     v = convex_hull(v);
     cout<<setprecision(20)<<diameter(v);

@@ -4,11 +4,11 @@ using ll = long long;
 using ld = long double;
 const ld PI = acosl(-1);
 short sign(ll x) { return (x > 0) - (x < 0); }
-struct Point {
-  typedef Point P;
+struct PT {
+  typedef PT P;
   typedef long long T;
   T x, y;
-  Point(T x=0, T y=0) : x(x), y(y) {}
+  PT(T x=0, T y=0) : x(x), y(y) {}
   bool operator<(P& p) const { return tie(x,y) < tie(p.x,p.y); }
   bool operator==(P& p) const { return tie(x,y)==tie(p.x,p.y); }
   P operator+(P& p) const { return P(x+p.x, y+p.y); }
@@ -30,10 +30,10 @@ struct Point {
   friend ostream& operator<<(ostream& os, P p) {return os << p.x << ' ' << p.y << '\n';}
   friend istream& operator>>(istream&in,P&p) {return in>>p.x>>p.y;}
 };
-int orientation(Point& a, Point& b, Point& c) { return sign((b-a).cross(c-a)); }
-ld pt_to_seg_mindis(Point& pt, Point& a, Point& b) {
-    Point ab = b - a;
-    Point ap = pt - a;
+int orientation(PT& a, PT& b, PT& c) { return sign((b-a).cross(c-a)); }
+ld pt_to_seg_mindis(PT& pt, PT& a, PT& b) {
+    PT ab = b - a;
+    PT ap = pt - a;
     auto bp = pt - b;
     auto ba = a- b;
     if(ab.dot(ap) < 0) return ap.dist();
