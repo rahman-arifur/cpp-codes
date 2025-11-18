@@ -5,7 +5,7 @@ class RollingHash {
 	int n;
 	vector<int> fwd1, fwd2, rev1, rev2;
 public:
-// B1, mod = (1949313259LL, 2091573227LL), (1997293877, 2117566807)
+// B1, mod = (1949313259LL, 2091573227LL), (1997293877, 2117566807), mod = (1ll<<61) -1
 	RollingHash(const string &s) {
 		n = s.size();
 		fwd1.resize(n + 1, 0);
@@ -35,9 +35,11 @@ public:
 	}
 };
 int main() {
+	pow1[0]=pow2[0]=1;
 	for(int i=1;i<mxn;i++) {
     	pow1[i] = B1 * pow1[i-1] % MOD1;
     	pow2[i] = B2 * pow2[i-1] % MOD2;
   	}
   return 0;
 }
+
