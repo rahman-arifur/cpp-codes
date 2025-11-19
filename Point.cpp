@@ -40,3 +40,8 @@ ld pt_to_seg_mindis(PT& pt, PT& a, PT& b) {
     else if(ba.dot(bp)<0) return bp.dist();
     else return fabsl(ap.cross(ab))/ab.dist();
 }
+ld pt_to_line(PT&a, PT& b, PT& p) {
+  ld dx = b.x - a.x;
+  ld dy = b.y - a.y;
+  return fabsl(dy * p.x - dx * p.y + b.x * a.y - b.y * a.x) / hypotl(dy, dx);
+}
