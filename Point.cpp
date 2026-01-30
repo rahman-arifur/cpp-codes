@@ -45,3 +45,19 @@ ld pt_to_line(PT&a, PT& b, PT& p) {
   ld dy = b.y - a.y;
   return fabsl(dy * p.x - dx * p.y + b.x * a.y - b.y * a.x) / hypotl(dy, dx);
 }
+
+bool upper(const PT& p) {
+    return (p.y > 0) || (p.y == 0 && p.x > 0);
+}
+bool sameRay(const PT& a, const PT& b) {
+    return a.cross(b) == 0 && a.dot(b) > 0;
+}
+// polar sort - ccw, reverse later for cw
+bool polarCmp(const PT& a, const PT& b) {
+    bool ua = upper(a);
+    bool ub = upper(b);
+    if (ua != ub) return ua > ub;
+    ll c = a.cross(b);
+    if (c != 0) return c > 0;
+    return a.dist2() < b.dist2();
+}
