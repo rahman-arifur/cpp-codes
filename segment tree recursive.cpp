@@ -42,14 +42,12 @@ private:
 	}
 
 public:
-	// array, null value, merge function
-	SegmentTree(vector<T>& a, T nll, function<T(T&, T&)> ff) {
-		func = ff;
-		E = nll;
-		swap(a, arr);
-		n = arr.size();
-		tree.resize(4 * n, E);
-		build(0, 0, n - 1);
+	// n, null value, merge function
+	SegmentTree(int sz, T nll, function<T(T&, T&)> ff) {
+		n = sz;
+		arr.resize(n, nll);
+		tree.resize(4 * n, nll);
+        func = ff;
 	}
 	void update(int idx, T val) {
 		update(0, 0, n - 1, idx, val);
