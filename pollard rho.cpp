@@ -46,7 +46,21 @@ namespace rho {
 
 };
 vector<pair<ll, ll>> primes;
-
+vector<ll> divs;
+// generate all divisors from prime factor map
+void gendiv(int i, ll v) {
+    if(i == primes.size()) {
+        divs.emplace_back(v);
+        return;
+    }
+    gendiv(i + 1, v);
+    auto [p, c] = primes[i];
+    ll mul = 1;
+    while(c--) {
+        mul *= p;
+        gendiv(i + 1, v * mul);
+    }
+}
 ll ans = -1, X;
 void dfs(int i, ll cur, ll phi) {
 	if (X / cur == phi) return void(ans = cur);
