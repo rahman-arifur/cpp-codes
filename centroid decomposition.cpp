@@ -5,7 +5,7 @@ using namespace std;
 #define mxn 200005
 // tophhh
 vector<int> adj[mxn];
-int subsz[mxn], gone[mxn];
+int subsz[mxn], gone[mxn], epar[mxn];
 int subdfs(int nd, int p = -1) {
   subsz[nd] = 1;
   for (int& ch : adj[nd]) {
@@ -23,15 +23,15 @@ int get_centroid(int nd, int tree_size, int p = -1) {
   }
   return nd;
 }
-void build_centroid(int nd, int sx) {
+void build_centroid(int nd, int sx, int p = -1) {
   int cntr = get_centroid(nd, subdfs(nd));
-
+  if(-1 == p) p = cntr;
   // do something
   gone[cntr] = sx;
-
+  epar[cntr] = p; // new tree construction
   for (int& ch : adj[cntr]) {
     if (gone[ch] != -1) continue;
-    build_centroid(ch, sx + 1);
+    build_centroid(ch, sx + 1, cntr);
   }
 }
 void _init(int n) {
