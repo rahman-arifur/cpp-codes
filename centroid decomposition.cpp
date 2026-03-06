@@ -1,5 +1,7 @@
 #include "bits/stdc++.h"
 using namespace std;
+// lca(a, b) in main tree = lca(a, b) in decomposed tree
+// at most logN levels, O(nlogn)
 #define mxn 200005
 // tophhh
 vector<int> adj[mxn];
