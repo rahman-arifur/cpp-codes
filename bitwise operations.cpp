@@ -1,4 +1,4 @@
-#define ckbit(n, k) ((n) & (1LL << (k)))
+#define ckbit(n, k) ((n) >> (k) & 1)
 #define toggle(n, k) ((n) ^= (1LL << (k)))    
 #define setbit(n, k) ((n) |= (1LL << (k)))     
 #define unsetbit(n, k) ((n) &= ~(1LL << (k))) 
