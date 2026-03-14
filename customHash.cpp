@@ -18,3 +18,7 @@ struct custom_hash {
         return splitmix64(x + FIXED_RANDOM);
     }
 };
+mt19937_64 rng(chrono::steady_clock::now().time_since_epoch().count());
+ll get_rand(ll l, ll r) {
+    return uniform_int_distribution<ll> (l, r)(rng);
+}
