@@ -1,120 +1,137 @@
-#include <bits/stdc++.h>
+#include <iostream>
+#include <vector>
+
 using namespace std;
-// 0 based version and array
+
+struct Node {
+    long long val;
+    int lc, rc;
+    Node(long long v = 0) : val(v), lc(0), rc(0) {}
+    Node(const Node& oth) {
+        val = oth.val; lc = oth.lc; rc = oth.rc;
+    }    
+    friend Node merge(const Node& a, const Node& b) {
+        return Node(a.val + b.val); 
+    }
+};
+
+template <typename T>
 struct PersistentSegTree {
-    struct Node {
-        long long val;
-        int lc, rc;
-    };
-
-    vector<Node> tree;
-    vector<int> roots; // Stores the root node index for each version
     int n;
+    vector<T> tree;
+    vector<int> roots; 
+    T E; // Neutral element
 
-    // Initialize with the maximum size of the array
-    PersistentSegTree(int size, int qry) : n(size) {
-        int m = 1 + 4 * n + (__lg(n) + 2) * qry;
+    PersistentSegTree(int size, int qry, T neutral = T()) : n(size), E(neutral) {
+        int m = 2 + 4 * n + (__lg(n) + 2) * qry;
         tree.reserve(m);
-        roots.reserve(m);
-        tree.push_back({0, 0, 0}); 
-        roots.push_back(0); 
+        roots.reserve(qry + 2);
+        
+        tree.emplace_back(E);
+        roots.emplace_back(0); // Dummy Version 0
     }
 
     int cloneNode(int v) {
-        tree.push_back(tree[v]);
+        tree.emplace_back(tree[v]);
         return tree.size() - 1;
     }
 
-    // Build the initial version (Version 0) from an array
-    int build(int l, int r, const vector<int>& a) {
-        int v = tree.size();
-        tree.push_back({0, 0, 0});
+    int build(int l, int r, const vector<long long>& a) {
         if (l == r) {
-            tree[v].val = a[l];
-            return v;
+            tree.emplace_back(T(a[l]));
+            return tree.size() - 1;
         }
+        int v = tree.size();
+        tree.emplace_back(E); // Placeholder
+        
         int mid = l + (r - l) / 2;
-        tree[v].lc = build(l, mid, a);
-        tree[v].rc = build(mid + 1, r, a);
-        tree[v].val = tree[tree[v].lc].val + tree[tree[v].rc].val;
+        int lc = build(l, mid, a);
+        int rc = build(mid + 1, r, a);
+        
+        // Merge math, then re-attach structural links
+        tree[v] = merge(tree[lc], tree[rc]);
+        tree[v].lc = lc;
+        tree[v].rc = rc;
         return v;
     }
 
-    void build_initial(const vector<int>& a) {
-        roots[0] = build(0, n - 1, a);
+    void build_initial(const vector<long long>& a) {
+        roots.emplace_back(build(0, n - 1, a)); 
     }
 
-    // Point update: returns the root of the newly created version
-    int update(int prev_v, int l, int r, int idx, int val) {
+    int update(int prev_v, int l, int r, int idx, const T& val) {
         int v = cloneNode(prev_v);
         
         if (l == r) {
-            tree[v].val = val; // Set the new value (or use += for incrementing)
+            tree[v] = val; // Triggers T's constructor
+            tree[v].lc = tree[v].rc = 0;
             return v;
         }
         
         int mid = l + (r - l) / 2;
-        if (idx <= mid) {
-            tree[v].lc = update(tree[prev_v].lc, l, mid, idx, val);
-        } else {
-            tree[v].rc = update(tree[prev_v].rc, mid + 1, r, idx, val);
-        }
         
-        // Push up
-        tree[v].val = tree[tree[v].lc].val + tree[tree[v].rc].val;
+        idx <= mid ? tree[v].lc = update(tree[prev_v].lc, l, mid, idx, val) 
+                   : tree[v].rc = update(tree[prev_v].rc, mid + 1, r, idx, val);
+        
+        // Merge math, then re-attach structural links
+        int lc = tree[v].lc;
+        int rc = tree[v].rc;
+        tree[v] = merge(tree[lc], tree[rc]);
+        tree[v].lc = lc;
+        tree[v].rc = rc;
+        
         return v;
     }
 
-    // Wrapper to update and save the new version root
-    void add_version(int prev_version, int idx, int val) {
-        int new_root = update(roots[prev_version], 0, n - 1, idx, val);
-        roots.push_back(new_root);
+    T query(int v, int l, int r, const int& ql, const int& qr) {
+        if (ql <= l && r <= qr) return tree[v];
+        int mid = l + (r - l) / 2;        
+        T qleft = (ql <= mid && tree[v].lc) ? query(tree[v].lc, l, mid, ql, qr) : E;
+        T qright = (qr > mid && tree[v].rc) ? query(tree[v].rc, mid + 1, r, ql, qr) : E;
+        return merge(qleft, qright);
     }
 
-    // Range query on a specific version
-    long long query(int v, int l, int r, int ql, int qr) {
-        // Out of bounds or null node
-        if (ql > r || qr < l || v == 0) return 0; 
-        
-        // Fully within bounds
-        if (ql <= l && r <= qr) return tree[v].val;
-        
-        // Partial overlap
-        int mid = l + (r - l) / 2;
-        return query(tree[v].lc, l, mid, ql, qr) + 
-               query(tree[v].rc, mid + 1, r, ql, qr);
+    void update(int ver, int idx, T val) {
+        roots[ver] = update(roots[ver], 0, n - 1, idx, val);
     }
 
-    // Wrapper for clean querying
-    long long query_version(int version, int ql, int qr) {
-        return query(roots[version], 0, n - 1, ql, qr);
+    T query(int ver, int ql, int qr) {
+        return query(roots[ver], 0, n - 1, ql, qr);
+    }
+
+    void copy_version(int ver) {
+        roots.emplace_back(roots[ver]); 
     }
 };
+// https://cses.fi/problemset/task/1737/
 int main() {
-    cin.tie(0)->sync_with_stdio(0);
-    int n, q; cin>>n>>q;
-    vector<int> a(n);
-    for(auto& i: a) cin>>i;
-    PersistentSegTree pst(n, q);
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+    
+    int n, q; 
+    cin >> n >> q;
+    vector<long long> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    
+    // T = Node. E = Node(0)
+    PersistentSegTree<Node> pst(n, q, Node(0));
     pst.build_initial(a);
-    while(q--) {
+    
+    while (q--) {
         int type, ver;
-        cin>>type>>ver;
-        --ver;
-        if(1 == type) {
-            int a, x;
-            cin>>a>>x;
-            a--;
-            pst.roots[ver] = pst.update(pst.roots[ver], 0, n - 1, a, x);
-        } else if(2 == type) {
+        cin >> type >> ver;
+        if (type == 1) {
+            int a; long long x;
+            cin >> a >> x;
+            pst.update(ver, a - 1, Node(x));
+        } else if (type == 2) {
             int l, r;
-            cin>>l>>r;
-            --l,--r;
-            cout << pst.query_version(ver, l, r) << '\n';
+            cin >> l >> r;
+            cout << pst.query(ver, l - 1, r - 1).val << '\n';
         } else {
-            pst.roots.push_back(pst.roots[ver]);
+            pst.copy_version(ver);
         }
     }
-    // https://cses.fi/problemset/task/1737
+    
     return 0;
 }
