@@ -1,66 +1,44 @@
-template <typename T>
-class SegmentTree {
-private:
-	// everything is 0 index
-	vector<T> tree, arr;
-	int n;
-	function<T(T&, T&)> func;  // merge function
-	// for sum, xor, min max etc
-
-	T E;  // when out of range what value to return
-	// ex: if out of range for range minimum E=+inf
-	// if xor E=0;
-	void build(int nd, int st, int ed) {
-		if (st == ed) return void(tree[nd] = arr[st]);
-		int m = st + ed >> 1, l = (nd << 1) | 1, r = l + 1;
-		build(l, st, m);
-		build(r, m + 1, ed);
-		tree[nd] = func(tree[l], tree[r]);
-	}
-
-	void update(int nd, int st, int ed, int idx, T val) {
-		if (st == ed) {
-			arr[idx] = val;
-			tree[nd] = val;
-			return;
-		}
-		int m = st + ed >> 1, l = (nd << 1) | 1, r = l + 1;
-		if (idx <= m)
-			update(l, st, m, idx, val);
-		else
-			update(r, m + 1, ed, idx, val);
-		tree[nd] = func(tree[l], tree[r]);
-	}
-
-	T query(int nd, int st, int ed, int L, int R) {
-		if (R < st || ed < L) return E;
-		if (L <= st && ed <= R) return tree[nd];
-		int m = st + ed >> 1, l = (nd << 1) | 1, r = l + 1;
-		T Lq = query(l, st, m, L, R);
-		T Rq = query(r, m + 1, ed, L, R);
-		return func(Lq, Rq);
-	}
-
-public:
-	// n, null value, merge function
-	SegmentTree(int sz, T nll, function<T(T&, T&)> ff) {
-		n = sz;
-		arr.resize(n, nll);
-		tree.resize(4 * n, nll);
-        func = ff;
-	}
-	void update(int idx, T val) {
-		update(0, 0, n - 1, idx, val);
-	}
-	T query(int l, int r) {
-		return query(0, 0, n - 1, l, r);
-	}
+struct Node {
+    long long val;
+    
+    Node(long long v = 0) : val(v) {}
+    
+    friend Node merge(const Node& a, const Node& b) {
+        return Node(a.val + b.val); 
+    }
 };
-// min->nll=inf, mx->nll= -inf
-// xor->nll=0, and->nll=LLONG_MAX(all bits set)
-// take input as arr=vector<T>
 
-// function<ll(ll&, ll&)> ff = [](ll& a, ll& b) {
-//         return a+b;
-// };
-// SegmentTree<ll> sg(a, 0, ff);
+template <typename T>
+struct SegmentTree {
+    int n;
+    vector<T> tree;
+    T E;
+
+    SegmentTree(int n, T neutral = T()) {
+        this->n = n;
+        E = neutral;
+        tree.assign(4 * n, E);
+    }
+
+    void update(int node, int st, int ed, const int& idx, const T& val) {
+        if (st == ed) {
+            tree[node] = val; 
+            return;
+        }
+        int mid = st + (ed - st) / 2;
+        idx <= mid ? update(node << 1, st, mid, idx, val) 
+                   : update(node << 1 | 1, mid + 1, ed, idx, val);
+        tree[node] = merge(tree[node << 1], tree[node << 1 | 1]);
+    }
+
+    T query(int node, int st, int ed, const int& l, const int& r) {
+        if (l <= st && ed <= r) return tree[node];
+        int mid = st + (ed - st) / 2;
+        T qleft = (l <= mid) ? query(node << 1, st, mid, l, r) : E;
+        T qright = (r > mid) ? query(node << 1 | 1, mid + 1, ed, l, r) : E;
+        return merge(qleft, qright);
+    }
+
+    void update(int idx, T val) { update(1, 0, n - 1, idx, val); }
+    T query(int l, int r) { return query(1, 0, n - 1, l, r); }
+};
