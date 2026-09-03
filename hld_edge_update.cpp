@@ -111,7 +111,6 @@ struct EdgeHLD {
         seg.build(1, 0, n - 1, flat_vals);
     }
 
-    // --- EDGE PATH UPDATE ---
     void update_path(int u, int v, ll val) {
         while (head[u] != head[v]) {
             if (depth[head[u]] < depth[head[v]]) swap(u, v);
@@ -120,14 +119,11 @@ struct EdgeHLD {
         }
         if (depth[u] > depth[v]) swap(u, v);
         
-        // CRUCIAL DIFFERENCE: pos[u] + 1
-        // Since u is the LCA, node 'u' holds the edge ABOVE the LCA. We skip it!
         if (u != v) {
             seg.update(1, 0, n - 1, pos[u] + 1, pos[v], val);
         }
     }
 
-    // --- EDGE PATH QUERY ---
     ll query_path(int u, int v) {
         ll res = 0;
         while (head[u] != head[v]) {
@@ -137,16 +133,13 @@ struct EdgeHLD {
         }
         if (depth[u] > depth[v]) swap(u, v);
         
-        // CRUCIAL DIFFERENCE: pos[u] + 1 skips the LCA's upward edge
         if (u != v) {
             res += seg.query(1, 0, n - 1, pos[u] + 1, pos[v]);
         }
         return res;
     }
     
-    // Helper to update a single specific edge
     void update_single_edge(int u, int v, ll val) {
-        // The edge is stored in whichever node is deeper
         if (depth[u] < depth[v]) swap(u, v);
         seg.update(1, 0, n - 1, pos[u], pos[u], val);
     }
